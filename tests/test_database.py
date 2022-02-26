@@ -231,6 +231,12 @@ class TestGraph(base.TestBase):
             }
         )
 
+    def test_get_indexed_vertex(self):
+        self.assertIs( self.graph.get_indexed_vertex("person", 'name', 'josh'), self.josh)
+
+    def test_get_indexed_vertex_no_key(self):
+        self.assertRaises( KeyError, self.graph.get_indexed_vertex, "person", "name", "kitty")
+
     def test_append_vertex(self):
         node = Vertex(label="NODE")
         self.graph.append_vertex(node)

@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import shutil
+import bidict
 from ruruki import interfaces
 from ruruki.locks import DirectoryLock
 from ruruki.entities import Vertex, Edge, PersistentVertex, PersistentEdge
@@ -239,7 +240,7 @@ class Graph(interfaces.IGraph):
         json.dump(data, file_handler, indent=4, sort_keys=True)
 
     def add_vertex_constraint(self, label, key):
-        self._vconstraints[label][key] = set()
+        self._vconstraints[label][key] = bidict.bidict()
 
     def get_vertex_constraints(self):
         constraints = []
@@ -269,9 +270,10 @@ class Graph(interfaces.IGraph):
                 if key not in kwargs:
                     continue
 
-                for vertex in collection:
-                    if vertex.properties[key] == kwargs[key]:
-                        return vertex
+                ind_key = kwargs[key]
+                indexed = collection.get(ind_key)
+                if indexed is not None:
+                    return indexed
 
         # no matches in constraints, so do a EntitySet filter
         vertices = self.vertices.filter(label, **kwargs)
@@ -301,7 +303,7 @@ class Graph(interfaces.IGraph):
 
     # my add
     def get_indexed_vertex(self, label, key, val):
-        
+        return self._vconstraints[label][key][val]
 
     # my add
     def get_single_edge(self, head, label, tail): #my add
@@ -357,7 +359,8 @@ class Graph(interfaces.IGraph):
         if vertex.label in self._vconstraints:
             for key in self._vconstraints[vertex.label]:
                 if key in vertex.properties:
-                    self._vconstraints[vertex.label][key].add(vertex)
+                    val = vertex.properties[key]
+                    self._vconstraints[vertex.label][key].put(val, vertex)
 
         self.bind_to_graph(vertex)
         self.vertices.add(vertex)
@@ -395,11 +398,11 @@ class Graph(interfaces.IGraph):
             for key, value in props.items():
                 if key not in key_index:
                     continue
-
-                for indexed_entity in key_index[key]:
-                    if indexed_entity != vertex:
-                        if indexed_entity.properties[key] == value:
-                            raise interfaces.ConstraintViolation(
+                
+                bd = key_index[key]
+                assert isinstance(bd, bidict.bidict)
+                if value in bd and bd[value] != vertex:
+                    raise interfaces.ConstraintViolation(
                                 "{!r} violated constraint {!r}".format(
                                     vertex, key
                                 )
@@ -498,7 +501,7 @@ class Graph(interfaces.IGraph):
         if vertex.label in self._vconstraints:
             for key in self._vconstraints[vertex.label]:
                 if key in vertex.properties:
-                    self._vconstraints[vertex.label][key].discard(vertex)
+                    self._vconstraints[vertex.label][key].inv.pop(vertex)
 
     def close(self):  # pragma: no cover
         # Nothing to do for the close at this stage.
