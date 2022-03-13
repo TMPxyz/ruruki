@@ -41,6 +41,13 @@ class Entity(interfaces.IEntity):
     def is_bound(self):
         return self.graph is not None
 
+    PROP_DEF = '__prop_def__'
+    def get_property(self, key, default=PROP_DEF): # my add
+        if default is Entity.PROP_DEF:
+            return self.properties[key]
+        else:
+            return self.properties.get(key, default)
+
     def remove_property(self, key):
         if key in self.properties:
             del self.properties[key]
