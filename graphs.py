@@ -286,7 +286,7 @@ class Graph(interfaces.IGraph):
 
         return self.add_vertex(label, **kwargs)
 
-    def get_or_create_edge(self, head, label, tail, **kwargs):
+    def get_or_create_edge(self, head, label, tail, eclass=None, **kwargs):
         if isinstance(head, tuple):
             head = self.get_or_create_vertex(head[0], **head[1])
 
@@ -299,7 +299,7 @@ class Graph(interfaces.IGraph):
         indexed_edge = self._econstraints.get((head, label, tail))
         if indexed_edge:
             return indexed_edge
-        return self.add_edge(head, label, tail, **kwargs)
+        return self.add_edge(head, label, tail, eclass, **kwargs)
 
     # my add
     def get_indexed_vertex(self, label, key, val):
@@ -366,8 +366,10 @@ class Graph(interfaces.IGraph):
         self.vertices.add(vertex)
         return vertex
 
-    def add_edge(self, head, label, tail, **kwargs):
-        edge = self._eclass(head, label, tail, **kwargs)
+    def add_edge(self, head, label, tail, eclass=None, **kwargs):
+        if eclass is None:
+            eclass = self._eclass
+        edge = eclass(head, label, tail, **kwargs)
         return self.append_edge(edge)
 
     def add_vertex(self, label=None, vclass=None, **kwargs):
