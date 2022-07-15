@@ -218,6 +218,43 @@ class Vertex(interfaces.IVertex, Entity):
         )
         return as_dict
 
+    #region ruruki extend
+
+    # for Vertex
+    def find_out_vertices(self, edge_label = None, vertex_label = None, *, 
+        edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=None):
+        if None == edge_kwargs: edge_kwargs = {}
+        if None == vertex_kwargs: vertex_kwargs = {}
+
+        out_vs = EntitySet([ e.get_out_vertex() for e in self.out_edges.filter(edge_label, **edge_kwargs) ])
+        if vertex_label:
+            out_vs = out_vs.filter(vertex_label, **vertex_kwargs)
+
+        if not assert_only_one_result:
+            return out_vs
+        else:
+            vs = out_vs.all()
+            assert len(vs)==1
+            return vs[0]
+
+    def find_in_vertices(self, edge_label=None, vertex_label=None, *, 
+        edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=False):
+        if edge_kwargs is None: edge_kwargs = {}
+        if vertex_kwargs is None: vertex_kwargs = {}
+
+        in_vs = EntitySet( [e.get_in_vertex() for e in self.in_edges.filter(edge_label, **edge_kwargs)] )
+        if vertex_label:
+            in_vs = in_vs.filter(vertex_label, **vertex_kwargs)
+        
+        if not assert_only_one_result:
+            return in_vs
+        else:
+            vs = in_vs.all()
+            assert len(vs)==1
+            return vs[0]
+
+    #endregion ruruki extend
+
 
 class PersistentVertex(Vertex):
     """

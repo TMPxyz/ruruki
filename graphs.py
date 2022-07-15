@@ -261,6 +261,9 @@ class Graph(interfaces.IGraph):
         entity.graph = self
 
     def get_or_create_vertex(self, label=None, **kwargs):
+        """NOTE: if two vconstraints keys_value pairs are given, and there is a node satisfying one of it, then we will not create a node with the two keys
+        The relation of kwargs for vconstraint keys are OR, not AND
+        """
         if not label and not kwargs:
             return None
 
