@@ -306,7 +306,10 @@ class Graph(interfaces.IGraph):
 
     # my add
     def get_indexed_vertex(self, label, key, val):
-        return self._vconstraints[label][key][val]
+        d1 = self._vconstraints[label]
+        d2 = d1.get(key, None)
+        if d2: return d2.get(val, None)
+        else: return None        
 
     # my add
     def get_single_edge(self, head, label, tail): #my add

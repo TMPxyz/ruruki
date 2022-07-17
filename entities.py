@@ -42,11 +42,17 @@ class Entity(interfaces.IEntity):
         return self.graph is not None
 
     PROP_DEF = '__prop_def__'
-    def get_property(self, key, default=PROP_DEF): # my add
-        if default is Entity.PROP_DEF:
-            return self.properties[key]
+    def get_property(self, key, default=PROP_DEF, initor=None): # my add
+        if key not in self.properties:
+            if initor is not None:
+                ans = self.properties[key] = initor(key)
+                return ans
+            elif default is PROP_DEF:
+                return self.properties[key]
+            else:
+                return self.properties.get(key, default)
         else:
-            return self.properties.get(key, default)
+            return self.properties[key]
 
     def remove_property(self, key):
         if key in self.properties:
