@@ -47,10 +47,10 @@ class Entity(interfaces.IEntity):
             if initor is not None:
                 ans = self.properties[key] = initor(key)
                 return ans
-            elif default is PROP_DEF:
-                return self.properties[key]
+            elif default is not Entity.PROP_DEF:
+                return default
             else:
-                return self.properties.get(key, default)
+                raise KeyError(f"unknown key: ({key})")
         else:
             return self.properties[key]
 
