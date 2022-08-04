@@ -198,16 +198,28 @@ class Vertex(interfaces.IVertex, Entity):
         return edges.filter(label, **kwargs)  # pylint: disable=no-member
 
     def get_in_vertices(self, label=None, **kwargs):
-        vertices = [
-            each.get_in_vertex() for each in self.get_in_edges()
-        ]
-        return EntitySet(vertices).filter(label, **kwargs)
+        if not kwargs:
+            ans = set()
+            for e in self.get_in_edges():
+                vo = e.get_in_vertex()
+                if vo.label == label: 
+                    ans.add(vo)
+            return ans
+        else:            
+            vertices = [ each.get_in_vertex() for each in self.get_in_edges() ]
+            return EntitySet(vertices).filter(label, **kwargs)
 
     def get_out_vertices(self, label=None, **kwargs):
-        vertices = [
-            each.get_out_vertex() for each in self.get_out_edges()
-        ]
-        return EntitySet(vertices).filter(label, **kwargs)
+        if not kwargs:
+            ans = set()
+            for e in self.get_out_edges():
+                vo = e.get_out_vertex()
+                if vo.label == label: 
+                    ans.add(vo)
+            return ans
+        else:            
+            vertices = [ each.get_out_vertex() for each in self.get_out_edges() ]
+            return EntitySet(vertices).filter(label, **kwargs)
 
     def get_both_vertices(self, label=None, **kwargs):
         in_set = self.get_in_vertices(label=label, **kwargs)
@@ -561,9 +573,8 @@ class EntitySet(interfaces.IEntitySet):
         collection["_all"].add(entity)
         for key in kwargs:
             s = collection.get(key)
-            if None == s:
-                s = set()
-                collection[key] = s
+            if None == s:                
+                collection[key] = s = set()
             s.add(entity)
 
     def add(self, entity):
