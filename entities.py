@@ -242,37 +242,37 @@ class Vertex(interfaces.IVertex, Entity):
     def find_out_vertices(self, edge_label, vertex_label, *, 
         edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=None):
         if not vertex_kwargs and not edge_kwargs:
-            out_vs = [ v for v in 
+            vs = { v for v in 
                     [ e.tail for e in self.out_edges if e.label == edge_label or edge_label is None ] 
-                    if v.label == vertex_label or vertex_label is None]
-            if not assert_only_one_result: return out_vs
+                    if v.label == vertex_label or vertex_label is None}
+            if not assert_only_one_result: return vs
             else:
-                assert len(out_vs)==1
-                return out_vs[0]
+                assert len(vs)==1
+                return next(iter(vs))
         else:
             if None == edge_kwargs: edge_kwargs = {}
             if None == vertex_kwargs: vertex_kwargs = {}
 
-            out_vs = EntitySet([ e.tail for e in self.out_edges.filter(edge_label, **edge_kwargs) ])
+            vs = EntitySet([ e.tail for e in self.out_edges.filter(edge_label, **edge_kwargs) ])
             if vertex_label:
-                out_vs = out_vs.filter(vertex_label, **vertex_kwargs)
+                vs = vs.filter(vertex_label, **vertex_kwargs)
 
-            if not assert_only_one_result: return out_vs
+            if not assert_only_one_result: return vs
             else:
-                vs = out_vs.all()
+                vs = vs.all()
                 assert len(vs)==1
                 return vs[0]
 
     def find_in_vertices(self, edge_label=None, vertex_label=None, *, 
         edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=False):
         if not vertex_kwargs and not edge_kwargs:
-            vs = [ v for v in 
+            vs = { v for v in 
                     [ e.head for e in self.in_edges if e.label == edge_label or edge_label is None ] 
-                    if v.label == vertex_label or vertex_label is None]
+                    if v.label == vertex_label or vertex_label is None }
             if not assert_only_one_result: return vs
             else:
                 assert len(vs)==1
-                return vs[0]
+                return next(iter(vs))
         else:
             if None == edge_kwargs: edge_kwargs = {}
             if None == vertex_kwargs: vertex_kwargs = {}
