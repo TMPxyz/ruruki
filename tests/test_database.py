@@ -327,7 +327,7 @@ class TestGraph(base.TestBase):
 
     def test_get_verticies(self):
         self.assertEqual(
-            self.graph.get_vertices().sorted(),
+            sorted(self.graph.get_vertices()),
             sorted(
                 [
                     self.marko, self.vadas, self.lop,
@@ -467,7 +467,7 @@ class TestGraph(base.TestBase):
             since="work"
         )
         self.assertEqual(
-            self.graph.get_edges(since__contains="o").sorted(),
+            sorted(self.graph.get_edges(since__contains="o")),
             sorted([marko_friend_josh]),
         )
 
@@ -477,7 +477,7 @@ class TestGraph(base.TestBase):
             since="work"
         )
         self.assertEqual(
-            self.graph.get_edges(since__startswith="w").sorted(),
+            sorted(self.graph.get_edges(since__startswith="w")),
             sorted([marko_friend_josh]),
         )
 
@@ -487,7 +487,7 @@ class TestGraph(base.TestBase):
             since="work"
         )
         self.assertEqual(
-            self.graph.get_edges(since__endswith="k").sorted(),
+            sorted(self.graph.get_edges(since__endswith="k")),
             sorted([marko_friend_josh]),
         )
 

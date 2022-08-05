@@ -202,7 +202,7 @@ class Vertex(interfaces.IVertex, Entity):
             ans = set()
             for e in self.get_in_edges():
                 vo = e.get_in_vertex()
-                if vo.label == label: 
+                if vo.label == label or label is None: 
                     ans.add(vo)
             return ans
         else:            
@@ -214,7 +214,7 @@ class Vertex(interfaces.IVertex, Entity):
             ans = set()
             for e in self.get_out_edges():
                 vo = e.get_out_vertex()
-                if vo.label == label: 
+                if vo.label == label or label is None: 
                     ans.add(vo)
             return ans
         else:            
@@ -239,37 +239,53 @@ class Vertex(interfaces.IVertex, Entity):
     #region ruruki extend
 
     # for Vertex
-    def find_out_vertices(self, edge_label = None, vertex_label = None, *, 
+    def find_out_vertices(self, edge_label, vertex_label, *, 
         edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=None):
-        if None == edge_kwargs: edge_kwargs = {}
-        if None == vertex_kwargs: vertex_kwargs = {}
-
-        out_vs = EntitySet([ e.get_out_vertex() for e in self.out_edges.filter(edge_label, **edge_kwargs) ])
-        if vertex_label:
-            out_vs = out_vs.filter(vertex_label, **vertex_kwargs)
-
-        if not assert_only_one_result:
-            return out_vs
+        if not vertex_kwargs and not edge_kwargs:
+            out_vs = [ v for v in 
+                    [ e.tail for e in self.out_edges if e.label == edge_label or edge_label is None ] 
+                    if v.label == vertex_label or vertex_label is None]
+            if not assert_only_one_result: return out_vs
+            else:
+                assert len(out_vs)==1
+                return out_vs[0]
         else:
-            vs = out_vs.all()
-            assert len(vs)==1
-            return vs[0]
+            if None == edge_kwargs: edge_kwargs = {}
+            if None == vertex_kwargs: vertex_kwargs = {}
+
+            out_vs = EntitySet([ e.tail for e in self.out_edges.filter(edge_label, **edge_kwargs) ])
+            if vertex_label:
+                out_vs = out_vs.filter(vertex_label, **vertex_kwargs)
+
+            if not assert_only_one_result: return out_vs
+            else:
+                vs = out_vs.all()
+                assert len(vs)==1
+                return vs[0]
 
     def find_in_vertices(self, edge_label=None, vertex_label=None, *, 
         edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=False):
-        if edge_kwargs is None: edge_kwargs = {}
-        if vertex_kwargs is None: vertex_kwargs = {}
-
-        in_vs = EntitySet( [e.get_in_vertex() for e in self.in_edges.filter(edge_label, **edge_kwargs)] )
-        if vertex_label:
-            in_vs = in_vs.filter(vertex_label, **vertex_kwargs)
-        
-        if not assert_only_one_result:
-            return in_vs
+        if not vertex_kwargs and not edge_kwargs:
+            vs = [ v for v in 
+                    [ e.head for e in self.in_edges if e.label == edge_label or edge_label is None ] 
+                    if v.label == vertex_label or vertex_label is None]
+            if not assert_only_one_result: return vs
+            else:
+                assert len(vs)==1
+                return vs[0]
         else:
-            vs = in_vs.all()
-            assert len(vs)==1
-            return vs[0]
+            if None == edge_kwargs: edge_kwargs = {}
+            if None == vertex_kwargs: vertex_kwargs = {}
+
+            vs = EntitySet([ e.head for e in self.in_edges.filter(edge_label, **edge_kwargs) ])
+            if vertex_label:
+                vs = vs.filter(vertex_label, **vertex_kwargs)
+
+            if not assert_only_one_result: return vs
+            else:
+                vs = vs.all()
+                assert len(vs)==1
+                return vs[0]
 
     #endregion ruruki extend
 

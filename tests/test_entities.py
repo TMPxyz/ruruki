@@ -167,7 +167,7 @@ class TestVertex(base.TestBase, TestEntityBase):
         )
 
         self.assertEqual(
-            sue.get_both_edges().sorted(),
+            sorted(sue.get_both_edges()),
             sorted(
                 [
                     new_edge
@@ -191,7 +191,7 @@ class TestVertex(base.TestBase, TestEntityBase):
         )
 
         self.assertEqual(
-            marko.get_both_edges().sorted(),
+            sorted(marko.get_both_edges()),
             [new_edge],
         )
 
@@ -211,7 +211,7 @@ class TestVertex(base.TestBase, TestEntityBase):
         )
 
         self.assertEqual(
-            marko.get_both_edges().sorted(),
+            sorted(marko.get_both_edges()),
             [new_edge],
         )
 
@@ -230,7 +230,7 @@ class TestVertex(base.TestBase, TestEntityBase):
         )
 
         self.assertEqual(
-            sue.get_both_edges().sorted(),
+            sorted(sue.get_both_edges()),
             sorted([new_edge]),
         )
 
@@ -266,7 +266,7 @@ class TestVertex(base.TestBase, TestEntityBase):
     def test_remove_edge(self):
         self.marko.remove_edge(self.marko_created_lop)
         self.assertEqual(
-            self.marko.get_both_edges().sorted(),
+            sorted(self.marko.get_both_edges()),
             sorted([self.marko_knows_josh, self.marko_knows_vadas])
         )
 
@@ -279,46 +279,46 @@ class TestVertex(base.TestBase, TestEntityBase):
 
     def test_get_in_edges(self):
         self.assertEqual(
-            self.josh.get_in_edges().sorted(),
+            sorted(self.josh.get_in_edges()),
             sorted([self.marko_knows_josh])
         )
 
     def test_get_in_edges_with_property(self):
         self.assertEqual(
-            self.josh.get_in_edges(weight=1).sorted(),
+            sorted(self.josh.get_in_edges(weight=1)),
             sorted([self.marko_knows_josh])
         )
 
     def test_get_in_edges_with_property_that_contains(self):
         self.marko_knows_josh.set_property(since="work")
         self.assertEqual(
-            self.josh.get_in_edges(since__contains="r").sorted(),
+            sorted(self.josh.get_in_edges(since__contains="r")),
             sorted([self.marko_knows_josh])
         )
 
     def test_get_in_edges_with_property_that_startswith(self):
         self.marko_knows_josh.set_property(since="work")
         self.assertEqual(
-            self.josh.get_in_edges(since__startswith="w").sorted(),
+            sorted(self.josh.get_in_edges(since__startswith="w")),
             sorted([self.marko_knows_josh])
         )
 
     def test_get_in_edges_with_property_that_endswith(self):
         self.marko_knows_josh.set_property(since="work")
         self.assertEqual(
-            self.josh.get_in_edges(since__endswith="k").sorted(),
+            sorted(self.josh.get_in_edges(since__endswith="k")),
             sorted([self.marko_knows_josh])
         )
 
     def test_get_out_edges(self):
         self.assertEqual(
-            self.josh.get_out_edges().sorted(),
+            sorted(self.josh.get_out_edges()),
             sorted([self.josh_created_lop, self.josh_created_ripple])
         )
 
     def test_get_out_edges_with_property(self):
         self.assertEqual(
-            self.josh.get_out_edges(weight=1).sorted(),
+            sorted(self.josh.get_out_edges(weight=1)),
             sorted([self.josh_created_ripple])
         )
 
@@ -326,7 +326,7 @@ class TestVertex(base.TestBase, TestEntityBase):
         self.josh_created_lop.set_property(since="work")
         self.josh_created_ripple.set_property(since="class")
         self.assertEqual(
-            self.josh.get_out_edges(since__contains="o").sorted(),
+            sorted(self.josh.get_out_edges(since__contains="o")),
             sorted([self.josh_created_lop])
         )
 
@@ -334,7 +334,7 @@ class TestVertex(base.TestBase, TestEntityBase):
         self.josh_created_lop.set_property(since="work")
         self.josh_created_ripple.set_property(since="class")
         self.assertEqual(
-            self.josh.get_out_edges(since__startswith="w").sorted(),
+            sorted(self.josh.get_out_edges(since__startswith="w")),
             sorted([self.josh_created_lop])
         )
 
@@ -342,13 +342,13 @@ class TestVertex(base.TestBase, TestEntityBase):
         self.josh_created_lop.set_property(since="work")
         self.josh_created_ripple.set_property(since="class")
         self.assertEqual(
-            self.josh.get_out_edges(since__endswith="s").sorted(),
+            sorted(self.josh.get_out_edges(since__endswith="s")),
             sorted([self.josh_created_ripple])
         )
 
     def test_get_both_edges(self):
         self.assertEqual(
-            self.josh.get_both_edges().sorted(),
+            sorted(self.josh.get_both_edges()),
             sorted(
                 [
                     self.josh_created_lop,
@@ -360,7 +360,7 @@ class TestVertex(base.TestBase, TestEntityBase):
 
     def test_get_both_edges_with_property(self):
         self.assertEqual(
-            self.josh.get_out_edges().sorted(),
+            sorted(self.josh.get_out_edges()),
             sorted(
                 [
                     self.josh_created_lop,
@@ -409,109 +409,109 @@ class TestVertex(base.TestBase, TestEntityBase):
 
     def test_get_in_vertices(self):
         self.assertEqual(
-            self.josh.get_in_vertices().sorted(),
+            sorted(self.josh.get_in_vertices()),
             sorted([self.marko])
         )
 
     def test_get_in_vertices_by_label(self):
         self.assertEqual(
-            self.josh.get_in_vertices(label="person").sorted(),
+            sorted(self.josh.get_in_vertices(label="person")),
             sorted([self.marko])
         )
 
     def test_get_in_vertices_by_property(self):
         self.assertEqual(
-            self.josh.get_in_vertices(name="marko").sorted(),
+            sorted(self.josh.get_in_vertices(name="marko")),
             sorted([self.marko])
         )
 
     def test_get_in_vertices_by_property_that_contains(self):
         self.assertEqual(
-            self.josh.get_in_vertices(name__contains="r").sorted(),
+            sorted(self.josh.get_in_vertices(name__contains="r")),
             sorted([self.marko])
         )
 
     def test_get_in_vertices_by_property_that_startswith(self):
         self.assertEqual(
-            self.josh.get_in_vertices(name__startswith="m").sorted(),
+            sorted(self.josh.get_in_vertices(name__startswith="m")),
             sorted([self.marko])
         )
 
     def test_get_in_vertices_by_property_that_endswith(self):
         self.assertEqual(
-            self.josh.get_in_vertices(name__endswith="o").sorted(),
+            sorted(self.josh.get_in_vertices(name__endswith="o")),
             sorted([self.marko])
         )
 
     def test_get_out_vertices(self):
         self.assertEqual(
-            self.josh.get_out_vertices().sorted(),
+            sorted(self.josh.get_out_vertices()),
             sorted([self.lop, self.ripple])
         )
 
     def test_get_out_vertices_by_label(self):
         self.assertEqual(
-            self.josh.get_out_vertices(label="app").sorted(),
+            sorted(self.josh.get_out_vertices(label="app")),
             sorted([self.lop, self.ripple])
         )
 
     def test_get_out_vertices_by_property(self):
         self.assertEqual(
-            self.josh.get_out_vertices(name="ripple").sorted(),
+            sorted(self.josh.get_out_vertices(name="ripple")),
             sorted([self.ripple])
         )
 
     def test_get_out_vertices_by_property_that_contains(self):
         self.assertEqual(
-            self.josh.get_out_vertices(name__contains="i").sorted(),
+            sorted(self.josh.get_out_vertices(name__contains="i")),
             sorted([self.ripple])
         )
 
     def test_get_out_vertices_by_property_that_startswith(self):
         self.assertEqual(
-            self.josh.get_out_vertices(name__startswith="l").sorted(),
+            sorted(self.josh.get_out_vertices(name__startswith="l")),
             sorted([self.lop])
         )
 
     def test_get_out_vertices_by_property_that_endswith(self):
         self.assertEqual(
-            self.josh.get_out_vertices(name__endswith="p").sorted(),
+            sorted(self.josh.get_out_vertices(name__endswith="p")),
             sorted([self.lop])
         )
 
     def test_get_both_vertices(self):
         self.assertEqual(
-            self.josh.get_both_vertices().sorted(),
+            sorted(self.josh.get_both_vertices()),
             sorted([self.marko, self.lop, self.ripple])
         )
 
     def test_get_both_vertices_by_label(self):
         self.assertEqual(
-            self.josh.get_both_vertices(label="person").sorted(),
+            sorted(self.josh.get_both_vertices(label="person")),
             sorted([self.marko])
         )
 
     def test_get_both_vertices_by_property(self):
         self.assertEqual(
-            self.josh.get_both_vertices(age=29).sorted(),
+            sorted(self.josh.get_both_vertices(age=29)),
             sorted([self.marko])
         )
 
     def test_get_both_vertices_by_property_that_contains(self):
         self.assertEqual(
-            self.josh.get_both_vertices(name__contains="r").sorted(),
+            sorted(self.josh.get_both_vertices(name__contains="r")),
             sorted([self.marko, self.ripple])
         )
 
     def test_get_both_vertices_by_property_that_startswith(self):
         self.assertEqual(
-            self.josh.get_both_vertices(name__startswith="m").sorted(),
+            sorted(self.josh.get_both_vertices(name__startswith="m")),
             sorted([self.marko])
         )
 
     def test_get_both_vertices_by_property_that_endsswith(self):
         self.assertEqual(
-            self.josh.get_both_vertices(name__endswith="o").sorted(),
+            sorted(self.josh.get_both_vertices(name__endswith="o")),
             sorted([self.marko])
         )
 
