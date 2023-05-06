@@ -185,6 +185,7 @@ class Graph(interfaces.IGraph):
         self._econstraints = defaultdict()
         self.vertices = EntitySet()
         self.edges = EntitySet()
+        self.repr_mode = 4
 
     def load(self, file_handler):
         vertex_id_mapping = {}
@@ -288,6 +289,31 @@ class Graph(interfaces.IGraph):
             return vertices.all()[0]
 
         return self.add_vertex(label, **kwargs)
+
+    def get_single_vertex(self, label=None, **kwargs):
+        if not label and not kwargs:
+            return None
+
+        # first check constraints.
+        if label in self._vconstraints:
+            for key, collection in self._vconstraints[label].items():
+                if key not in kwargs:
+                    continue
+
+                ind_key = kwargs[key]
+                indexed = collection.get(ind_key)
+                if indexed is not None:
+                    return indexed
+
+        # no matches in constraints, so do a EntitySet filter
+        vertices = self.vertices.filter(label, **kwargs)
+        if len(vertices) > 1:
+            raise interfaces.MultipleFoundExpectedOne(
+                "Multiple vertices found when one expected."
+            )
+        
+        ans = vertices.all()
+        return ans[0] if ans else None
 
     def get_or_create_edge(self, head, label, tail, eclass=None, **kwargs):
         if isinstance(head, tuple):

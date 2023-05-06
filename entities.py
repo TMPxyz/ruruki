@@ -112,9 +112,13 @@ class Entity(interfaces.IEntity):
         )
 
     def __repr__(self):  # pragma: no cover
-        return "<{0}> ident: {1}, label: {2}, properties: {3}".format(
-            self.__class__.__name__, self.ident, self.label, self.properties
-        )
+        mode = self.graph.repr_mode
+        if mode>=4:
+            return "<{0}> ident: {1}, label: {2}, properties: {3}".format(
+                self.__class__.__name__, self.ident, self.label, self.properties
+            )
+        elif mode>=1:
+            return "<{0} {1}>".format(self.__class__.__name__, self.ident)
 
 
 class Vertex(interfaces.IVertex, Entity):
@@ -239,16 +243,14 @@ class Vertex(interfaces.IVertex, Entity):
     #region ruruki extend
 
     # for Vertex
-    def find_out_vertices(self, edge_label, vertex_label, *, 
-        edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=None):
+    def find_out_vertices(self, edge_label=None, vertex_label=None, *, 
+        edge_kwargs = None, vertex_kwargs = None, one_result=False):
         if not vertex_kwargs and not edge_kwargs:
             vs = { v for v in 
                     [ e.tail for e in self.out_edges if e.label == edge_label or edge_label is None ] 
                     if v.label == vertex_label or vertex_label is None}
-            if not assert_only_one_result: return vs
-            else:
-                assert len(vs)==1
-                return next(iter(vs))
+            if not one_result: return vs
+            else: return next(iter(vs), None)
         else:
             if None == edge_kwargs: edge_kwargs = {}
             if None == vertex_kwargs: vertex_kwargs = {}
@@ -257,22 +259,17 @@ class Vertex(interfaces.IVertex, Entity):
             if vertex_label:
                 vs = vs.filter(vertex_label, **vertex_kwargs)
 
-            if not assert_only_one_result: return vs
-            else:
-                vs = vs.all()
-                assert len(vs)==1
-                return vs[0]
+            if not one_result: return vs
+            else: return next( iter(vs), None )
 
     def find_in_vertices(self, edge_label=None, vertex_label=None, *, 
-        edge_kwargs = None, vertex_kwargs = None, assert_only_one_result=False):
+        edge_kwargs = None, vertex_kwargs = None, one_result=False):
         if not vertex_kwargs and not edge_kwargs:
             vs = { v for v in 
                     [ e.head for e in self.in_edges if e.label == edge_label or edge_label is None ] 
                     if v.label == vertex_label or vertex_label is None }
-            if not assert_only_one_result: return vs
-            else:
-                assert len(vs)==1
-                return next(iter(vs))
+            if not one_result: return vs
+            else: return next(iter(vs), None)
         else:
             if None == edge_kwargs: edge_kwargs = {}
             if None == vertex_kwargs: vertex_kwargs = {}
@@ -281,11 +278,8 @@ class Vertex(interfaces.IVertex, Entity):
             if vertex_label:
                 vs = vs.filter(vertex_label, **vertex_kwargs)
 
-            if not assert_only_one_result: return vs
-            else:
-                vs = vs.all()
-                assert len(vs)==1
-                return vs[0]
+            if not one_result: return vs
+            else: return next( iter(vs), None )
 
     #endregion ruruki extend
 
@@ -359,13 +353,18 @@ class Edge(interfaces.IEdge, Entity):
         )
 
     def __repr__(self):  # pragma: no cover
-        return (
-            "<{0}> ident: {1}, label: {2}, properties: "
-            "{3} [{4}-{2}-{5}]".format(
-                self.__class__.__name__, self.ident, self.label,
-                self.properties, self.head.ident, self.tail.ident
+        mode = self.graph.repr_mode
+        if mode >= 4:
+            return (
+                "<{0}> ident: {1}, label: {2}, properties: "
+                "{3} [{4}-{2}-{5}]".format(
+                    self.__class__.__name__, self.ident, self.label,
+                    self.properties, self.head.ident, self.tail.ident
+                )
             )
-        )
+        elif mode >= 1:
+            return "<{0} {1}>[{3}-{2}-{4}]".format(self.__class__.__name__, self.ident, self.label, self.head.ident, self.tail.ident)
+
 
 
 class PersistentEdge(Edge):
