@@ -641,6 +641,7 @@ class EntitySet(interfaces.IEntitySet):
             for key, value in keys_values
         }
 
+        exact_mode = kwargs.pop('exact_mode', False)
         elements = set()
         if label is None:
             elements = set(self._id_reference.values())
@@ -653,6 +654,7 @@ class EntitySet(interfaces.IEntitySet):
 
         container = EntitySet()
         for entity in elements:
+            if exact_mode and len(entity.properties) != len(kwargs): continue
             mismatch = False
             for key, value in keys_values:
                 key, verb = noun_verb_cache[key]
