@@ -112,7 +112,7 @@ class Entity(interfaces.IEntity):
         )
 
     def __repr__(self):  # pragma: no cover
-        mode = self.graph.repr_mode
+        mode = self.graph.repr_mode if self.graph else 4
         if mode>=4:
             return "<{0}> ident: {1}, label: {2}, properties: {3}".format(
                 self.__class__.__name__, self.ident, self.label, self.properties
@@ -507,7 +507,6 @@ def _ne(prop_value, cmp_value, ignore_case=False):
         cmp_value = cmp_value.lower()
     return cmp_value != prop_value
 
-
 OPERATORS = {
     "contains": _contains,
     "icontains": _contains,  # require to be called with ignore_case
@@ -644,13 +643,24 @@ class EntitySet(interfaces.IEntitySet):
         exact_mode = kwargs.pop('exact_mode', False)
         elements = set()
         if label is None:
-            elements = set(self._id_reference.values())
+            elements = set(self._id_reference.values())            
         elif label in self._prop_reference:
             for key, value in keys_values:
                 key, verb = noun_verb_cache[key]
-                if key not in self._prop_reference[label]:
-                    return EntitySet()
-                elements = elements | self._prop_reference[label][key]
+                if verb == 'hasprop': continue
+                else:
+                    if key not in self._prop_reference[label]:
+                        return EntitySet()
+                    else:
+                        elements = elements | self._prop_reference[label][key]
+            if not elements:
+                elements = set(self._prop_reference[label]['_all'])
+        for key, value in keys_values:
+            key, verb = noun_verb_cache[key]
+            if verb != 'hasprop': continue
+            if value: elements = { x for x in elements if key in x.properties }
+            else: elements = { x for x in elements if key not in x.properties }
+            
 
         container = EntitySet()
         for entity in elements:
@@ -658,6 +668,7 @@ class EntitySet(interfaces.IEntitySet):
             mismatch = False
             for key, value in keys_values:
                 key, verb = noun_verb_cache[key]
+                if verb=='hasprop': continue
                 icase = verb[0] == "i" if verb else False
                 func = get_func(verb)
                 if key not in entity.properties:

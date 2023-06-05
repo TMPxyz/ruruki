@@ -353,6 +353,26 @@ class TestGraph(base.TestBase):
             sorted(self.graph.get_vertices(name="josh")),
             [self.josh],
         )
+    
+    def test_get_vertices_with_hasprop(self):
+        self.assertEqual( len(self.graph.get_vertices(age__hasprop=True)), 4)
+        self.assertEqual( len(self.graph.get_vertices(age__hasprop=False)), 2)
+        self.assertEqual( len(self.graph.get_vertices(name__hasprop=True)), 6)
+        self.assertEqual( len(self.graph.get_vertices(nope__hasprop=True)), 0)
+        self.assertEqual( len(self.graph.get_vertices(nope__hasprop=False)), 6)
+        self.assertEqual( len(self.graph.get_vertices("person", name__hasprop=True)), 4)
+        self.assertEqual( len(self.graph.get_vertices("person", name__hasprop=False)), 0)
+        self.assertEqual( len(self.graph.get_vertices("person", nope__hasprop=True)), 0)
+        self.assertEqual( len(self.graph.get_vertices("person", nope__hasprop=False)), 4)
+        self.assertEqual( len(self.graph.get_vertices("app", lang__hasprop=True)), 2)
+        self.assertEqual( len(self.graph.get_vertices("app", lang__hasprop=False)), 0)
+
+
+    def test_get_vertices_with_gt(self):
+        self.assertEqual(
+            len(self.graph.get_vertices(age__gt=0)),
+            4
+        )
 
     def test_get_verticies_with_contains(self):
         self.assertEqual(
