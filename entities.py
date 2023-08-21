@@ -112,14 +112,24 @@ class Entity(interfaces.IEntity):
         )
 
     def __repr__(self):  # pragma: no cover
-        mode = self.graph.repr_mode if self.graph else 4
-        if mode>=4:
+        mode = self.graph.repr_mode if self.graph else 0
+        if mode==0:
             return "<{0}> ident: {1}, label: {2}, properties: {3}".format(
                 self.__class__.__name__, self.ident, self.label, self.properties
             )
-        elif mode>=1:
-            return "<{0} {1}>".format(self.__class__.__name__, self.ident)
-
+        args = []
+        if mode & 20: tps = set(self.properties.keys()) & self.graph.all_types
+        if mode & 1: args.append( self.__class__.__name__)
+        if mode & 2: args.append( str(self.ident) )
+        if mode & 4: args.append( ','.join(tps) )
+        if mode & 8: args.append( self.properties.get('name', '') )
+        if mode & 16: 
+            mp = self.graph.tp_formatters
+            for tp in tps:
+                if tp in mp:
+                    args.append( mp[tp](self) )
+                    break
+        return '<{}>'.format(':'.join(args))
 
 class Vertex(interfaces.IVertex, Entity):
     """
@@ -353,8 +363,8 @@ class Edge(interfaces.IEdge, Entity):
         )
 
     def __repr__(self):  # pragma: no cover
-        mode = self.graph.repr_mode
-        if mode >= 4:
+        mode = self.graph.repr_mode if self.graph else 0
+        if mode == 0:
             return (
                 "<{0}> ident: {1}, label: {2}, properties: "
                 "{3} [{4}-{2}-{5}]".format(
@@ -362,8 +372,8 @@ class Edge(interfaces.IEdge, Entity):
                     self.properties, self.head.ident, self.tail.ident
                 )
             )
-        elif mode >= 1:
-            return "<{0} {1}>[{3}-{2}-{4}]".format(self.__class__.__name__, self.ident, self.label, self.head.ident, self.tail.ident)
+        else:
+            return "<{1}>[{3}-{2}-{4}]".format(self.__class__.__name__, self.ident, self.label, self.head.ident, self.tail.ident)
 
 
 

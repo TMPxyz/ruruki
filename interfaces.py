@@ -2,7 +2,7 @@
 Database interfaces.
 """
 import abc
-from collections import MutableSet
+from collections.abc import MutableSet
 from collections import namedtuple
 
 

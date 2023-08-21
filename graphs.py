@@ -185,7 +185,10 @@ class Graph(interfaces.IGraph):
         self._econstraints = defaultdict()
         self.vertices = EntitySet()
         self.edges = EntitySet()
-        self.repr_mode = 4
+        # expanded functionalities
+        self.repr_mode = 0
+        self.all_types = None
+        self.tp_formatters = None
 
     def load(self, file_handler):
         vertex_id_mapping = {}
@@ -339,7 +342,7 @@ class Graph(interfaces.IGraph):
 
     # my add
     def get_single_edge(self, head, label, tail): #my add
-        indexed_edge = self._econstraints.get((head, label, tail))
+        indexed_edge = self._econstraints.get((head, label, tail), None)
         return indexed_edge
 
     def append_edge(self, edge):

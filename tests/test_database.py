@@ -237,6 +237,16 @@ class TestGraph(base.TestBase):
     def test_get_indexed_vertex_no_key(self):
         self.assertIsNone( self.graph.get_indexed_vertex("person", "name", "kitty") )
 
+    def test_get_single_edge(self):
+        marko = self.graph.get_vertex(0)
+        vadas = self.graph.get_vertex(1)
+        self.assertIsNotNone( self.graph.get_single_edge(marko, 'knows', vadas) )
+
+    def test_get_single_edge_not_exist(self):
+        marko = self.graph.get_vertex(0)
+        peter = self.graph.get_vertex(5)
+        self.assertIsNone( self.graph.get_single_edge(marko, 'knows', peter) )
+
     def test_append_vertex(self):
         node = Vertex(label="NODE")
         self.graph.append_vertex(node)
